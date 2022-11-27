@@ -9,7 +9,8 @@
     "fmt": "npm run eslint -- --fix && npm run prettier -- --write",
     "lint": "npm run eslint && npm run prettier -- --check",
     "eslint": "eslint . --ext ts",
-    "prettier": "prettier \"**/*.ts\""
+    "prettier": "prettier \"**/*.ts\"",
+    "release": "standard-version"
   },
   "repository": {
     "type": "git",
@@ -36,6 +37,7 @@
     "eslint": "^8.28.0",
     "eslint-plugin-unicorn": "^45.0.0",
     "prettier": "2.8.0",
+    "standard-version": "^9.5.0",
     "typescript": "4.9.3",
     "vite": "3.2.4"
   },
