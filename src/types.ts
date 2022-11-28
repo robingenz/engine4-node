@@ -49,6 +49,12 @@ export interface AuthenticateResult {
    */
   expiresIn: number;
   /**
+   * The refresh token.
+   *
+   * @since 0.0.1
+   */
+  refreshToken: string;
+  /**
    * The scope of the token.
    *
    * @since 0.0.1
