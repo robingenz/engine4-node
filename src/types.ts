@@ -12,11 +12,17 @@ export interface ENGINE4Interface {
    */
   delete(options: DeleteOptions): Promise<void>;
   /**
-   * Fetch generic data elements.
+   * Fetch multiple generic data elements.
    *
    * @since 0.0.1
    */
   fetch(options: FetchOptions): Promise<FetchResult>;
+  /**
+   * Fetch a single generic data element.
+   *
+   * @since 0.0.1
+   */
+  get(options: GetOptions): Promise<GetResult>;
   /**
    * Insert or update generic data elements.
    *
