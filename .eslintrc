@@ -12,7 +12,9 @@
     "unicorn/no-null": "off",
     "unicorn/no-useless-undefined": "off",
     "unicorn/prefer-ternary": "off",
-    "@typescript-eslint/explicit-member-accessibility": "error",
     "@typescript-eslint/no-floating-promises": "error"
+  },
+  "parserOptions": {
+    "project": "./tsconfig.json"
   }
 }

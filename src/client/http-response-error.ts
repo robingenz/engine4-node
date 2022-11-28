@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export class HttpResponseError extends Error {
   public readonly status: number;
   public readonly statusText: string;
