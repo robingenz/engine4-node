@@ -1,0 +1,45 @@
+{
+  "name": "@robingenz/engine4-node",
+  "version": "0.0.1",
+  "description": "Node.js library for the ENGINE4 API.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "fmt": "npm run eslint -- --fix && npm run prettier -- --write",
+    "lint": "npm run eslint && npm run prettier -- --check",
+    "eslint": "eslint . --ext ts",
+    "prettier": "prettier \"**/*.ts\"",
+    "release": "standard-version"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/robingenz/engine4-node.git"
+  },
+  "keywords": [
+    "engine4"
+  ],
+  "author": "Robin Genz <mail@robingenz.dev>",
+  "license": "Beerware",
+  "bugs": {
+    "url": "https://github.com/robingenz/engine4-node/issues"
+  },
+  "homepage": "https://github.com/robingenz/engine4-node",
+  "dependencies": {
+    "node-fetch": "2.6.7"
+  },
+  "devDependencies": {
+    "@robingenz/prettier-config": "0.1.0",
+    "@types/node": "18.11.9",
+    "@types/node-fetch": "2.6.2",
+    "@typescript-eslint/eslint-plugin": "5.44.0",
+    "@typescript-eslint/parser": "5.44.0",
+    "eslint": "8.28.0",
+    "eslint-plugin-unicorn": "45.0.0",
+    "prettier": "2.8.0",
+    "standard-version": "9.5.0",
+    "typescript": "4.9.3",
+    "vite": "3.2.4"
+  },
+  "prettier": "@robingenz/prettier-config"
+}
