@@ -1,5 +1,8 @@
 # engine4-node
 
+[![npm (version)](https://img.shields.io/npm/v/@robingenz/engine4-node)](https://www.npmjs.com/package/@robingenz/engine4-node)
+[![npm (downloads)](https://img.shields.io/npm/dm/@robingenz/engine4-node)](https://www.npmjs.com/package/@robingenz/engine4-node)
+
 ⚙️ Node.js library for the ENGINE4 API.
 
 ## Installation
