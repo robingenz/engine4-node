@@ -11,7 +11,6 @@
 
 ```bash
 npm install @robingenz/engine4-node
-npx cap sync
 ```
 
 ## Usage
