@@ -29,12 +29,22 @@ const authenticate = async () => {
   return accessToken;
 };
 
+const delete = async () => {
+  const accessToken = await authenticate();
+
+  await engine4.delete({
+    accessToken,
+    entityId: '39aeedee-91e3-4ec4-b7bb-b5a036601f9f',
+    dataId: '3c7d04f7-74e6-4cfd-9fd6-233c6f4ded8a',
+  });
+};
+
 const fetch = async () => {
   const accessToken = await authenticate();
 
   const { items } = await engine4.fetch({
     accessToken,
-    entityId: '868d3b4e-cf31-4c33-8462-e16837c06706',
+    entityId: '7130fa8b-4040-40d0-b97b-a9006fc140ec',
     take: 10,
     skip: 20,
     filter: {
@@ -50,6 +60,34 @@ const fetch = async () => {
     ],
   });
   return items;
+};
+
+const get = async () => {
+  const accessToken = await authenticate();
+
+  const { item } = await engine4.get({
+    accessToken,
+    entityId: '39aeedee-91e3-4ec4-b7bb-b5a036601f9f',
+    dataId: '3c7d04f7-74e6-4cfd-9fd6-233c6f4ded8a',
+  });
+  return item;
+};
+
+const saveAll = async () => {
+  const accessToken = await authenticate();
+
+  const { item } = await engine4.saveAll({
+    accessToken,
+    items: [
+      {
+        entityId: '39aeedee-91e3-4ec4-b7bb-b5a036601f9f',
+        dataId: '3c7d04f7-74e6-4cfd-9fd6-233c6f4ded8a',
+        custom_001: 'my_value',
+      }
+    ],
+    returnType: 'dataId',
+  });
+  return item;
 };
 ```
 

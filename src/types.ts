@@ -1,3 +1,33 @@
+export interface ENGINE4Interface {
+  /**
+   * Authenticate with the ENGINE4 External API.
+   *
+   * @since 0.0.1
+   */
+  authenticate(options: AuthenticateOptions): Promise<AuthenticateResult>;
+  /**
+   * Delete a generic data element.
+   *
+   * @since 0.0.1
+   */
+  delete(options: DeleteOptions): Promise<void>;
+  /**
+   * Fetch generic data elements.
+   *
+   * @since 0.0.1
+   */
+  fetch(options: FetchOptions): Promise<FetchResult>;
+  /**
+   * Insert or update generic data elements.
+   *
+   * If a `DataId` is provided, the existing generic data element will be updated.
+   * If no `DataId` is provided, a new generic data element will be created.
+   *
+   * @since 0.0.1
+   */
+  saveAll(options: SaveAllOptions): Promise<SaveAllResult>;
+}
+
 export interface ENGINE4Options {
   /**
    * The base URL of the ENGINE4 server.
@@ -68,10 +98,7 @@ export interface AuthenticateResult {
   tokenType: 'Bearer';
 }
 
-/**
- * @since 0.0.1
- */
-export interface FetchOptions {
+export interface BaseOptions {
   /**
    * The access token to use to authenticate the request.
    *
@@ -80,6 +107,30 @@ export interface FetchOptions {
    * @since 0.0.1
    */
   accessToken: string;
+}
+
+/**
+ * @since 0.0.1
+ */
+export interface DeleteOptions extends BaseOptions {
+  /**
+   * The ID of the entity to delete data from.
+   *
+   * @since 0.0.1
+   */
+  entityId: string;
+  /**
+   * The ID of the genric data element to delete.
+   *
+   * @since 0.0.1
+   */
+  dataId: string;
+}
+
+/**
+ * @since 0.0.1
+ */
+export interface FetchOptions extends BaseOptions {
   /**
    * The ID of the entity to retrieve data from.
    *
@@ -167,6 +218,70 @@ export interface FetchSortingOptions {
 export interface FetchResult {
   /**
    * The fetched generic data elements.
+   *
+   * @since 0.0.1
+   */
+  items: GenericDataElement[];
+}
+
+/**
+ * @since 0.0.1
+ */
+export interface GetOptions extends BaseOptions {
+  /**
+   * The ID of the entity to retrieve data from.
+   *
+   * @since 0.0.1
+   */
+  entityId: string;
+  /**
+   * The ID of the genric data element to retrieve.
+   *
+   * @since 0.0.1
+   */
+  dataId: string;
+}
+
+/**
+ * @since 0.0.1
+ */
+export interface GetResult {
+  /**
+   * The fetched generic data element.
+   *
+   * @since 0.0.1
+   */
+  item: GenericDataElement;
+}
+
+/**
+ * @since 0.0.1
+ */
+export interface SaveAllOptions extends BaseOptions {
+  /**
+   * The generic data elements to save.
+   *
+   * @since 0.0.1
+   */
+  items: GenericDataElement[];
+  /**
+   * The return type of the saved generic data elements.
+   *
+   * @since 0.0.1
+   * @default 'none'
+   */
+  returnType?: 'none' | 'dataId' | 'full';
+}
+
+/**
+ * @since 0.0.1
+ */
+export interface SaveAllResult {
+  /**
+   * The saved generic data elements.
+   *
+   * If `returnType` is set to `none`, this will be an empty array.
+   * If `returnType` is set to `dataId`, only `dataId` and `entityId` will be returned.
    *
    * @since 0.0.1
    */

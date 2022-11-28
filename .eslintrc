@@ -9,10 +9,18 @@
     "plugin:unicorn/recommended"
   ],
   "rules": {
+    "@typescript-eslint/no-floating-promises": "error",
     "unicorn/no-null": "off",
     "unicorn/no-useless-undefined": "off",
     "unicorn/prefer-ternary": "off",
-    "@typescript-eslint/no-floating-promises": "error"
+    "unicorn/prevent-abbreviations": [
+      "error",
+      {
+        "allowList": {
+          "params": true
+        }
+      }
+    ]
   },
   "parserOptions": {
     "project": "./tsconfig.json"
