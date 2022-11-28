@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import { ENDPOINTS } from '../constants';
-import { AuthenticateOptions, AuthenticateResult, ENGINE4Options } from '../types';
+import { AuthenticateOptions, AuthenticateResult, ENGINE4Options, FetchOptions, FetchResult } from '../types';
 import { HttpResponseError } from './http-response-error';
 
 export default class ENGINE4 {
@@ -42,7 +42,50 @@ export default class ENGINE4 {
     };
   }
 
-  // private createAuthorizationHeader(): string {
-  //   return `Bearer ${this.token}`;
-  // }
+  public async fetch(options: FetchOptions): Promise<FetchResult> {
+    const headers = {
+      Accept: 'application/json',
+      Authorization: this.createAuthorizationHeader(options.accessToken),
+      'Content-Type': 'application/json',
+    };
+    let filter = null;
+    if (options.filter) {
+      filter = {
+        GenericName: options.filter.genericName,
+        CompareOperator: options.filter.compareOperator,
+        Value: options.filter.value,
+      };
+    }
+    let sorting: { GenericName: string; Descending: boolean }[] = [];
+    if (options.sorting) {
+      sorting = options.sorting.map(item => {
+        return {
+          GenericName: item.genericName,
+          Descending: item.sort === 'desc' ? true : false,
+        };
+      });
+    }
+    const body = JSON.stringify({
+      EntityId: options.entityId,
+      Take: options.take,
+      Skip: options.skip,
+      WithLongValues: options.withLongValues,
+      IsActive: options.isActive,
+      Filter: filter,
+      Sortings: sorting,
+    });
+    const method = 'POST';
+    const url = new URL(ENDPOINTS.FETCH, this.baseUrl).toString();
+    const response = await fetch(url, { method, body, headers });
+    if (!response.ok) {
+      throw new HttpResponseError(response.status, response.statusText, await response.text());
+    }
+    return {
+      items: await response.json(),
+    };
+  }
+
+  private createAuthorizationHeader(token: string): string {
+    return `Bearer ${token}`;
+  }
 }
