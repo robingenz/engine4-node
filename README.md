@@ -9,17 +9,26 @@
 
 ## Installation
 
+Use [npm](https://docs.npmjs.com/cli/) to install the package:
+
 ```bash
 npm install @robingenz/engine4-node
 ```
 
 ## Usage
 
+First of all, you import `ENGINE4` so that you can create an instance of the class.
+You need to pass the `baseUrl` of the API server:
+
 ```typescript
-import { ENGINE4, CompareOperator } from '@robingenz/engine4-node';
+import { ENGINE4 } from '@robingenz/engine4-node';
 
-const engine4 = new ENGINE4({ baseUrl: 'https://dev.engine4.io' });
+const engine4 = new ENGINE4({ baseUrl: 'https://prod.engine4.io' });
+```
 
+Now you can authenticate yourself with `username`, `password` and `clientId`:
+
+```typescript
 const authenticate = async () => {
   const { accessToken } = await engine4.authenticate({
     username: 'my_username',
@@ -28,10 +37,18 @@ const authenticate = async () => {
   });
   return accessToken;
 };
+```
+
+The access token is required for the following calls.
+
+Here you can find examples for deleting, querying, inserting and updating records:
+
+```typescript
+import { ENGINE4, CompareOperator } from '@robingenz/engine4-node';
+
+const accessToken = await authenticate();
 
 const delete = async () => {
-  const accessToken = await authenticate();
-
   await engine4.delete({
     accessToken,
     entityId: '39aeedee-91e3-4ec4-b7bb-b5a036601f9f',
@@ -40,8 +57,6 @@ const delete = async () => {
 };
 
 const fetch = async () => {
-  const accessToken = await authenticate();
-
   const { items } = await engine4.fetch({
     accessToken,
     entityId: '7130fa8b-4040-40d0-b97b-a9006fc140ec',
@@ -63,8 +78,6 @@ const fetch = async () => {
 };
 
 const get = async () => {
-  const accessToken = await authenticate();
-
   const { item } = await engine4.get({
     accessToken,
     entityId: '39aeedee-91e3-4ec4-b7bb-b5a036601f9f',
@@ -74,8 +87,6 @@ const get = async () => {
 };
 
 const saveAll = async () => {
-  const accessToken = await authenticate();
-
   const { item } = await engine4.saveAll({
     accessToken,
     items: [
