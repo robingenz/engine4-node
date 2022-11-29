@@ -148,11 +148,13 @@ export interface FetchOptions extends BaseOptions {
    */
   filter?: FetchFilterOptions;
   /**
+   * If `true`, only non-deleted records will be returned.
    * If `false`, only deleted records will be returned.
+   * If `null`, all records will be returned.
    *
    * @since 0.0.1
    */
-  isActive?: boolean;
+  isActive?: boolean | null;
   /**
    * The number of records to skip.
    *
