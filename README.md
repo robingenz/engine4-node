@@ -23,7 +23,7 @@ You need to pass the `baseUrl` of the API server:
 ```typescript
 import { ENGINE4 } from 'engine4-node';
 
-const engine4 = new ENGINE4({ baseUrl: 'https://prod.engine4.io' });
+const engine4 = new ENGINE4({ baseUrl: 'https://test.engine4.io' });
 ```
 
 Now you can authenticate yourself with `username`, `password` and `clientId`:
