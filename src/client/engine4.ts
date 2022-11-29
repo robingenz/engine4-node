@@ -140,9 +140,10 @@ export default class ENGINE4 implements ENGINE4Interface {
       Authorization: this.createAuthorizationHeader(options.accessToken),
       'Content-Type': 'application/json',
     };
+    const returnType = options.returnType || 'none';
     const body = JSON.stringify({
       items: options.items,
-      returnType: options.returnType || 'none',
+      returnType,
     });
     const method = 'POST';
     const url = new URL(ENDPOINTS.SAVE_ALL, this.baseUrl).toString();
@@ -151,7 +152,7 @@ export default class ENGINE4 implements ENGINE4Interface {
       throw new HttpResponseError(response.status, response.statusText, await response.text());
     }
     return {
-      items: options.returnType === 'none' ? [] : await response.json(),
+      items: returnType === 'none' ? [] : await response.json(),
     };
   }
 
