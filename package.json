@@ -1,5 +1,5 @@
 {
-  "name": "@robingenz/engine4-node",
+  "name": "engine4-node",
   "version": "0.0.1",
   "description": "Node.js library for the ENGINE4 API.",
   "main": "dist/index.js",

@@ -2,8 +2,8 @@
 
 [![Build](https://img.shields.io/github/workflow/status/robingenz/engine4-node/CI/main)](https://github.com/robingenz/engine4-node/actions?query=workflow%3A%22CI%22)
 [![License](https://img.shields.io/github/license/robingenz/engine4-node)](https://github.com/robingenz/engine4-node/blob/main/LICENSE)
-[![npm (version)](https://img.shields.io/npm/v/@robingenz/engine4-node)](https://www.npmjs.com/package/@robingenz/engine4-node)
-[![npm (downloads)](https://img.shields.io/npm/dm/@robingenz/engine4-node)](https://www.npmjs.com/package/@robingenz/engine4-node)
+[![npm (version)](https://img.shields.io/npm/v/engine4-node)](https://www.npmjs.com/package/engine4-node)
+[![npm (downloads)](https://img.shields.io/npm/dm/engine4-node)](https://www.npmjs.com/package/engine4-node)
 
 ⚙️ Node.js library for the ENGINE4 API.
 
@@ -12,7 +12,7 @@
 Use [npm](https://docs.npmjs.com/cli/) to install the package:
 
 ```bash
-npm install @robingenz/engine4-node
+npm install engine4-node
 ```
 
 ## Usage
@@ -21,7 +21,7 @@ First of all, you import `ENGINE4` so that you can create an instance of the cla
 You need to pass the `baseUrl` of the API server:
 
 ```typescript
-import { ENGINE4 } from '@robingenz/engine4-node';
+import { ENGINE4 } from 'engine4-node';
 
 const engine4 = new ENGINE4({ baseUrl: 'https://prod.engine4.io' });
 ```
@@ -44,7 +44,7 @@ The access token is required for the following calls.
 Here you can find examples for deleting, querying, inserting and updating records:
 
 ```typescript
-import { ENGINE4, CompareOperator } from '@robingenz/engine4-node';
+import { ENGINE4, CompareOperator } from 'engine4-node';
 
 const accessToken = await authenticate();
 
