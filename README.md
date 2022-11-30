@@ -91,9 +91,9 @@ const saveAll = async () => {
     accessToken,
     items: [
       {
-        entityId: '39aeedee-91e3-4ec4-b7bb-b5a036601f9f',
-        dataId: '3c7d04f7-74e6-4cfd-9fd6-233c6f4ded8a',
-        custom_001: 'my_value',
+        EntityId: '39aeedee-91e3-4ec4-b7bb-b5a036601f9f',
+        DataId: '3c7d04f7-74e6-4cfd-9fd6-233c6f4ded8a',
+        Custom_001: 'my_value',
       }
     ],
     returnType: 'dataId',
