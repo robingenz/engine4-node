@@ -1,7 +1,7 @@
 # engine4-node
 
 [![Build](https://img.shields.io/github/workflow/status/robingenz/engine4-node/CI/main)](https://github.com/robingenz/engine4-node/actions?query=workflow%3A%22CI%22)
-[![License](https://img.shields.io/github/license/robingenz/engine4-node)](https://github.com/robingenz/engine4-node/blob/main/LICENSE)
+[![License](https://img.shields.io/npm/l/engine4-node)](https://github.com/robingenz/engine4-node/blob/main/LICENSE)
 [![npm (version)](https://img.shields.io/npm/v/engine4-node)](https://www.npmjs.com/package/engine4-node)
 [![npm (downloads)](https://img.shields.io/npm/dm/engine4-node)](https://www.npmjs.com/package/engine4-node)
 
