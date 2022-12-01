@@ -134,6 +134,24 @@ export interface DeleteOptions extends BaseOptions {
 }
 
 /**
+ * @since 0.0.3
+ */
+export interface DeleteMultipleOptions extends BaseOptions {
+  /**
+   * The ID of the entity to delete data from.
+   *
+   * @since 0.0.3
+   */
+  entityId: string;
+  /**
+   * The IDs of the genric data elements to delete.
+   *
+   * @since 0.0.3
+   */
+  dataIds: string[];
+}
+
+/**
  * @since 0.0.1
  */
 export interface FetchOptions extends BaseOptions {

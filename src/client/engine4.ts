@@ -3,6 +3,7 @@ import { ENDPOINTS } from '../constants';
 import {
   AuthenticateOptions,
   AuthenticateResult,
+  DeleteMultipleOptions,
   DeleteOptions,
   ENGINE4Interface,
   ENGINE4Options,
@@ -67,6 +68,25 @@ export default class ENGINE4 implements ENGINE4Interface {
     });
     const method = 'DELETE';
     const url = new URL(`${ENDPOINTS.DELETE}?${params}`, this.baseUrl).toString();
+    const response = await fetch(url, { method, headers });
+    if (!response.ok) {
+      throw new HttpResponseError(response.status, response.statusText, await response.text());
+    }
+  }
+
+  public async deleteMultiple(options: DeleteMultipleOptions): Promise<void> {
+    const headers = {
+      Accept: 'application/json',
+      Authorization: this.createAuthorizationHeader(options.accessToken),
+    };
+    const params = new URLSearchParams({
+      entityId: options.entityId,
+    });
+    for (const dataId of options.dataIds) {
+      params.append('dataIds', dataId);
+    }
+    const method = 'DELETE';
+    const url = new URL(`${ENDPOINTS.DELETE_MULTIPLE}?${params}`, this.baseUrl).toString();
     const response = await fetch(url, { method, headers });
     if (!response.ok) {
       throw new HttpResponseError(response.status, response.statusText, await response.text());
