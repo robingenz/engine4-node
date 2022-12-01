@@ -56,6 +56,17 @@ const delete = async () => {
   });
 };
 
+const deleteMultiple = async () => {
+  await engine4.deleteMultiple({
+    accessToken,
+    entityId: '39aeedee-91e3-4ec4-b7bb-b5a036601f9f',
+    dataIds: [
+      '3c7d04f7-74e6-4cfd-9fd6-233c6f4ded8a',
+      '7130fa8b-4040-40d0-b97b-a9006fc140ec',
+    ],
+  });
+};
+
 const fetch = async () => {
   const { items } = await engine4.fetch({
     accessToken,
@@ -84,6 +95,18 @@ const get = async () => {
     dataId: '3c7d04f7-74e6-4cfd-9fd6-233c6f4ded8a',
   });
   return item;
+};
+
+const getMultiple = async () => {
+  const { items } = await engine4.getMultiple({
+    accessToken,
+    entityId: '39aeedee-91e3-4ec4-b7bb-b5a036601f9f',
+    dataIds: [
+      '3c7d04f7-74e6-4cfd-9fd6-233c6f4ded8a',
+      '7130fa8b-4040-40d0-b97b-a9006fc140ec',
+    ],
+  });
+  return items;
 };
 
 const saveAll = async () => {
