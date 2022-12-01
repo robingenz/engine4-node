@@ -263,6 +263,36 @@ export interface GetResult {
 }
 
 /**
+ * @since 0.0.3
+ */
+export interface GetMultipleOptions extends BaseOptions {
+  /**
+   * The ID of the entity to retrieve data from.
+   *
+   * @since 0.0.3
+   */
+  entityId: string;
+  /**
+   * The IDs of the genric data elements to retrieve.
+   *
+   * @since 0.0.3
+   */
+  dataIds: string[];
+}
+
+/**
+ * @since 0.0.1
+ */
+export interface GetMultipleResult {
+  /**
+   * The fetched generic data elements.
+   *
+   * @since 0.0.1
+   */
+  items: GenericDataElement[];
+}
+
+/**
  * @since 0.0.1
  */
 export interface SaveAllOptions extends BaseOptions {

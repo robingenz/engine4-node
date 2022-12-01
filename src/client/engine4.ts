@@ -8,6 +8,8 @@ import {
   ENGINE4Options,
   FetchOptions,
   FetchResult,
+  GetMultipleOptions,
+  GetMultipleResult,
   GetOptions,
   GetResult,
   SaveAllOptions,
@@ -131,6 +133,28 @@ export default class ENGINE4 implements ENGINE4Interface {
     }
     return {
       item: await response.json(),
+    };
+  }
+
+  public async getMultiple(options: GetMultipleOptions): Promise<GetMultipleResult> {
+    const headers = {
+      Accept: 'application/json',
+      Authorization: this.createAuthorizationHeader(options.accessToken),
+    };
+    const params = new URLSearchParams({
+      entityId: options.entityId,
+    });
+    for (const dataId of options.dataIds) {
+      params.append('dataIds', dataId);
+    }
+    const method = 'GET';
+    const url = new URL(`${ENDPOINTS.GET_MULTIPLE}?${params}`, this.baseUrl).toString();
+    const response = await fetch(url, { method, headers });
+    if (!response.ok) {
+      throw new HttpResponseError(response.status, response.statusText, await response.text());
+    }
+    return {
+      items: await response.json(),
     };
   }
 
