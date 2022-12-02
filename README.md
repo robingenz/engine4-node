@@ -110,7 +110,7 @@ const getMultiple = async () => {
 };
 
 const saveAll = async () => {
-  const { item } = await engine4.saveAll({
+  const { items } = await engine4.saveAll({
     accessToken,
     items: [
       {
@@ -121,7 +121,7 @@ const saveAll = async () => {
     ],
     returnType: 'dataId',
   });
-  return item;
+  return items;
 };
 ```
 
