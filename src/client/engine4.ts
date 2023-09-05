@@ -7,6 +7,8 @@ import {
   DeleteOptions,
   ENGINE4Interface,
   ENGINE4Options,
+  FetchAttachmentOptions,
+  FetchAttachmentResult,
   FetchOptions,
   FetchResult,
   GetMultipleOptions,
@@ -197,6 +199,24 @@ export default class ENGINE4 implements ENGINE4Interface {
     }
     return {
       items: returnType === 'none' ? [] : await response.json(),
+    };
+  }
+
+  public async fetchAttachment(options: FetchAttachmentOptions): Promise<FetchAttachmentResult> {
+    const headers = {
+      Authorization: this.createAuthorizationHeader(options.accessToken),
+    };
+    const params = new URLSearchParams({
+      dataId: options.dataId,
+    });
+    const method = 'GET';
+    const url = new URL(`${ENDPOINTS.FETCH_ATTACHMENT}?${params}`, this.baseUrl).toString();
+    const response = await fetch(url, { method, headers });
+    if (!response.ok) {
+      throw new HttpResponseError(response.status, response.statusText, await response.text());
+    }
+    return {
+      item: await response.buffer(),
     };
   }
 

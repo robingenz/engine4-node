@@ -345,6 +345,30 @@ export interface SaveAllResult {
 }
 
 /**
+ * @since 0.0.4
+ */
+export interface FetchAttachmentOptions extends BaseOptions {
+  /**
+   * The ID of the attachment to fetch.
+   *
+   * @since 0.0.4
+   */
+  dataId: string;
+}
+
+/**
+ * @since 0.0.4
+ */
+export interface FetchAttachmentResult {
+  /**
+   * The fetched attachment.
+   *
+   * @since 0.0.4
+   */
+  item: Buffer;
+}
+
+/**
  * @since 0.0.1
  */
 export type GenericColumnName = keyof GenericDataElement;

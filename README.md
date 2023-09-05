@@ -123,6 +123,26 @@ const saveAll = async () => {
   });
   return items;
 };
+
+const fetchAttachment = async () => {
+  const { item } = await engine4.fetchAttachment({
+    accessToken,
+    dataId: "ea10248d-1fe8-4baf-84d7-d18a64106b40",
+  });
+  return item;
+};
+
+const fetchAndSaveAttachment = async () => {
+  const { writeFile } = require("fs");
+  const { promisify } = require("util");
+  const writeFilePromise = promisify(writeFile);
+
+  const { item } = await engine4.fetchAttachment({
+    accessToken,
+    dataId: "ea10248d-1fe8-4baf-84d7-d18a64106b40",
+  });
+  await writeFilePromise("test.pdf", item);
+};
 ```
 
 ## Changelog
