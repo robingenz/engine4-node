@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.4](https://github.com/robingenz/engine4-node/compare/v0.0.3...v0.0.4) (2023-09-05)
+
+
+### Features
+
+* add `fetchAttachment` method ([8408f3c](https://github.com/robingenz/engine4-node/commit/8408f3ce9d027790827b24a6f852d1a2cec6e833))
+
 ### [0.0.3](https://github.com/robingenz/engine4-node/compare/v0.0.2...v0.0.3) (2022-12-01)
 
 
