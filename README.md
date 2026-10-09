@@ -15,6 +15,8 @@ Use [npm](https://docs.npmjs.com/cli/) to install the package:
 npm install engine4-node
 ```
 
+Requires Node.js 20.19 or later. The package is ESM-only.
+
 ## Usage
 
 First of all, you import `ENGINE4` so that you can create an instance of the class.
@@ -48,7 +50,7 @@ import { ENGINE4, CompareOperator } from 'engine4-node';
 
 const accessToken = await authenticate();
 
-const delete = async () => {
+const deleteItem = async () => {
   await engine4.delete({
     accessToken,
     entityId: '39aeedee-91e3-4ec4-b7bb-b5a036601f9f',
@@ -56,18 +58,15 @@ const delete = async () => {
   });
 };
 
-const deleteMultiple = async () => {
+const deleteItems = async () => {
   await engine4.deleteMultiple({
     accessToken,
     entityId: '39aeedee-91e3-4ec4-b7bb-b5a036601f9f',
-    dataIds: [
-      '3c7d04f7-74e6-4cfd-9fd6-233c6f4ded8a',
-      '7130fa8b-4040-40d0-b97b-a9006fc140ec',
-    ],
+    dataIds: ['3c7d04f7-74e6-4cfd-9fd6-233c6f4ded8a', '7130fa8b-4040-40d0-b97b-a9006fc140ec'],
   });
 };
 
-const fetch = async () => {
+const fetchItems = async () => {
   const { items } = await engine4.fetch({
     accessToken,
     entityId: '7130fa8b-4040-40d0-b97b-a9006fc140ec',
@@ -88,7 +87,7 @@ const fetch = async () => {
   return items;
 };
 
-const get = async () => {
+const getItem = async () => {
   const { item } = await engine4.get({
     accessToken,
     entityId: '39aeedee-91e3-4ec4-b7bb-b5a036601f9f',
@@ -97,19 +96,16 @@ const get = async () => {
   return item;
 };
 
-const getMultiple = async () => {
+const getItems = async () => {
   const { items } = await engine4.getMultiple({
     accessToken,
     entityId: '39aeedee-91e3-4ec4-b7bb-b5a036601f9f',
-    dataIds: [
-      '3c7d04f7-74e6-4cfd-9fd6-233c6f4ded8a',
-      '7130fa8b-4040-40d0-b97b-a9006fc140ec',
-    ],
+    dataIds: ['3c7d04f7-74e6-4cfd-9fd6-233c6f4ded8a', '7130fa8b-4040-40d0-b97b-a9006fc140ec'],
   });
   return items;
 };
 
-const saveAll = async () => {
+const saveItems = async () => {
   const { items } = await engine4.saveAll({
     accessToken,
     items: [
@@ -117,7 +113,7 @@ const saveAll = async () => {
         EntityId: '39aeedee-91e3-4ec4-b7bb-b5a036601f9f',
         DataId: '3c7d04f7-74e6-4cfd-9fd6-233c6f4ded8a',
         Custom_001: 'my_value',
-      }
+      },
     ],
     returnType: 'dataId',
   });
@@ -127,22 +123,36 @@ const saveAll = async () => {
 const fetchAttachment = async () => {
   const { item } = await engine4.fetchAttachment({
     accessToken,
-    dataId: "ea10248d-1fe8-4baf-84d7-d18a64106b40",
+    dataId: 'ea10248d-1fe8-4baf-84d7-d18a64106b40',
   });
   return item;
 };
 
 const fetchAndSaveAttachment = async () => {
-  const { writeFile } = require("fs");
-  const { promisify } = require("util");
-  const writeFilePromise = promisify(writeFile);
+  const { writeFile } = await import('node:fs/promises');
 
   const { item } = await engine4.fetchAttachment({
     accessToken,
-    dataId: "ea10248d-1fe8-4baf-84d7-d18a64106b40",
+    dataId: 'ea10248d-1fe8-4baf-84d7-d18a64106b40',
   });
-  await writeFilePromise("test.pdf", item);
+  await writeFile('test.pdf', item);
 };
+```
+
+### Error handling
+
+Failed requests throw an `ENGINE4Error` with the HTTP `status`, `statusText` and the parsed response `body`:
+
+```typescript
+import { ENGINE4Error } from 'engine4-node';
+
+try {
+  await engine4.get({ accessToken, entityId, dataId });
+} catch (error) {
+  if (error instanceof ENGINE4Error) {
+    console.error(error.status, error.message);
+  }
+}
 ```
 
 ## Changelog

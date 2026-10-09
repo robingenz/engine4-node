@@ -1,39 +1,3 @@
-export interface ENGINE4Interface {
-  /**
-   * Authenticate with the ENGINE4 External API.
-   *
-   * @since 0.0.1
-   */
-  authenticate(options: AuthenticateOptions): Promise<AuthenticateResult>;
-  /**
-   * Delete a generic data element.
-   *
-   * @since 0.0.1
-   */
-  delete(options: DeleteOptions): Promise<void>;
-  /**
-   * Fetch multiple generic data elements.
-   *
-   * @since 0.0.1
-   */
-  fetch(options: FetchOptions): Promise<FetchResult>;
-  /**
-   * Fetch a single generic data element.
-   *
-   * @since 0.0.1
-   */
-  get(options: GetOptions): Promise<GetResult>;
-  /**
-   * Insert or update generic data elements.
-   *
-   * If a `DataId` is provided, the existing generic data element will be updated.
-   * If no `DataId` is provided, a new generic data element will be created.
-   *
-   * @since 0.0.1
-   */
-  saveAll(options: SaveAllOptions): Promise<SaveAllResult>;
-}
-
 export interface ENGINE4Options {
   /**
    * The base URL of the ENGINE4 server.
