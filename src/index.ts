@@ -1,3 +1,3 @@
+export { ENGINE4 } from './client';
+export { ENGINE4Error } from './errors';
 export * from './types';
-
-export { default as ENGINE4 } from './client/engine4';

@@ -1,21 +1,24 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2015",
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022"],
+    "types": ["node"],
     "declaration": true,
-    "outDir": "./dist",
     "sourceMap": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
     "strict": true,
-    "strictFunctionTypes": true,
     "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "alwaysStrict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": true,
     "skipLibCheck": true,
     "esModuleInterop": true
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "exclude": ["dist", "node_modules"]
 }
