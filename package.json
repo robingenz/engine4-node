@@ -1,6 +1,6 @@
 {
   "name": "engine4-node",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Node.js library for the ENGINE4 API.",
   "repository": {
     "type": "git",

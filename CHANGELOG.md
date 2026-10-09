@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/robingenz/engine4-node/compare/v0.1.0...v0.1.1) (2026-10-09)
+
+
+### Features
+
+* add metadata, upload and single document methods ([#5](https://github.com/robingenz/engine4-node/issues/5)) ([8d18ee2](https://github.com/robingenz/engine4-node/commit/8d18ee26a5121ffad8b1b2f8897fca8dbeebb29a))
+
 ## [0.1.0](https://github.com/robingenz/engine4-node/compare/v0.0.4...v0.1.0) (2026-10-09)
 
 
