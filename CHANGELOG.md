@@ -1,6 +1,15 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+## [0.1.0](https://github.com/robingenz/engine4-node/compare/v0.0.4...v0.1.0) (2026-10-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* support new ENGINE4 API features ([#3](https://github.com/robingenz/engine4-node/issues/3)). See [BREAKING.md](https://github.com/robingenz/engine4-node/blob/main/BREAKING.md).
+
+### Features
+
+* support new ENGINE4 API features ([#3](https://github.com/robingenz/engine4-node/issues/3)) ([b22ee7e](https://github.com/robingenz/engine4-node/commit/b22ee7ef7ff07792e963ee13363bd03c13cf00b0))
 
 ### [0.0.4](https://github.com/robingenz/engine4-node/compare/v0.0.3...v0.0.4) (2023-09-05)
 
