@@ -1,5 +1,12 @@
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
-import type { CustomValue, GenericDataElement, SavedItemReference } from '../src/index';
+import type {
+  CustomValue,
+  CustomValueOf,
+  FetchFilterOptions,
+  GenericDataElement,
+  GetOptions,
+  SavedItemReference,
+} from '../src/index';
 import { CompareOperator, ENGINE4, ENGINE4Error } from '../src/index';
 import { mockFetchJson } from './helpers';
 
@@ -170,6 +177,26 @@ describe('ENGINE4', () => {
     expectTypeOf(untyped.item).toEqualTypeOf<GenericDataElement<string>>();
   });
 
+  it('types custom values as typed whenever strings may be disabled', () => {
+    expectTypeOf<CustomValueOf<{ convertAllCustomDataToStrings: true }>>().toEqualTypeOf<string>();
+    expectTypeOf<
+      CustomValueOf<{ convertAllCustomDataToStrings: false }>
+    >().toEqualTypeOf<CustomValue>();
+    expectTypeOf<CustomValueOf<GetOptions>>().toEqualTypeOf<CustomValue>();
+  });
+
+  it('requires a filter value matching the operator', () => {
+    const filters: FetchFilterOptions[] = [
+      // @ts-expect-error `In` requires an array
+      { genericName: 'Custom_001', compareOperator: CompareOperator.In, value: 'a' },
+      // @ts-expect-error `Equal` requires a value
+      { genericName: 'Custom_001', compareOperator: CompareOperator.Equal },
+      // @ts-expect-error `IsNull` takes no value
+      { genericName: 'Custom_001', compareOperator: CompareOperator.IsNull, value: 'a' },
+    ];
+    expect(filters).toHaveLength(3);
+  });
+
   it('types the saveAll result by return type', async () => {
     mockFetchJson([]);
     const items = [{ EntityId: 'e', Custom_001: 1 }];
@@ -192,6 +219,20 @@ describe('ENGINE4', () => {
     const result = await client.fetchAttachment({ accessToken, dataId: 'd' });
 
     expect(result.item).toEqual(Buffer.from([1, 2, 3]));
+  });
+
+  it('falls back to the plain filename on malformed encoding', async () => {
+    const headers = {
+      'content-disposition': `attachment; filename="a.pdf"; filename*=UTF-8''%E0%A4%A.pdf`,
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(new Uint8Array(), { headers })),
+    );
+
+    const result = await client.fetchAttachment({ accessToken, dataId: 'd' });
+
+    expect(result.filename).toBe('a.pdf');
   });
 
   it('throws an ENGINE4Error with the parsed body on failure', async () => {

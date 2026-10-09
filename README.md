@@ -141,12 +141,14 @@ const fetchAttachment = async () => {
 
 const fetchAndSaveAttachment = async () => {
   const { writeFile } = await import('node:fs/promises');
+  const { basename } = await import('node:path');
 
   const { item, filename } = await engine4.fetchAttachment({
     accessToken,
     dataId: 'ea10248d-1fe8-4baf-84d7-d18a64106b40',
   });
-  await writeFile(filename ?? 'attachment', item);
+  // Strip directories from the server-provided file name to prevent path traversal.
+  await writeFile(basename(filename ?? 'attachment'), item);
 };
 ```
 

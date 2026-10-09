@@ -236,10 +236,11 @@ function toApiFilter(filter: FetchFilterOptions): ApiFilter {
   if ('groups' in filter) {
     return { Logic: filter.logic, Groups: filter.groups.map(toApiFilter) };
   }
+  const value = 'value' in filter ? filter.value : undefined;
   return {
     GenericName: filter.genericName,
     CompareOperator: filter.compareOperator,
-    Value: Array.isArray(filter.value) ? JSON.stringify(filter.value) : filter.value,
+    Value: Array.isArray(value) ? JSON.stringify(value) : value,
   };
 }
 
@@ -250,7 +251,11 @@ function parseFilename(contentDisposition: string | null): string | undefined {
   // RFC 6266: prefer the UTF-8 encoded `filename*` over the plain `filename`.
   const encoded = /filename\*=UTF-8''([^;]+)/i.exec(contentDisposition);
   if (encoded) {
-    return decodeURIComponent(encoded[1]);
+    try {
+      return decodeURIComponent(encoded[1]);
+    } catch {
+      // Malformed percent-encoding: fall back to the plain `filename`.
+    }
   }
   return /filename="?([^";]+)"?/i.exec(contentDisposition)?.[1];
 }

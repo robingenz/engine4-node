@@ -135,11 +135,12 @@ export interface ConvertCustomDataOptions {
  *
  * @since 0.1.0
  */
-export type CustomValueOf<T extends ConvertCustomDataOptions> = T extends {
-  convertAllCustomDataToStrings: false;
-}
-  ? CustomValue
-  : string;
+export type CustomValueOf<T extends ConvertCustomDataOptions> =
+  'convertAllCustomDataToStrings' extends keyof T
+    ? false extends T['convertAllCustomDataToStrings']
+      ? CustomValue
+      : string
+    : string;
 
 /**
  * A custom value with its underlying data type.
@@ -247,30 +248,70 @@ export interface FetchOptions extends BaseOptions, ConvertCustomDataOptions {
 export type FetchFilterOptions = FetchFilterCondition | FetchFilterGroup;
 
 /**
+ * A filter condition. The type of `value` depends on the `compareOperator`.
+ *
  * @since 0.1.0
  */
-export interface FetchFilterCondition {
+export type FetchFilterCondition =
+  FetchFilterValueCondition | FetchFilterInCondition | FetchFilterNullCondition;
+
+/**
+ * @since 0.1.0
+ */
+export interface BaseFetchFilterCondition {
   /**
    * The name of the generic column to filter on.
    *
    * @since 0.0.1
    */
   genericName: GenericColumnName;
+}
+
+/**
+ * @since 0.1.0
+ */
+export interface FetchFilterValueCondition extends BaseFetchFilterCondition {
   /**
    * The operator to use to filter the results.
    *
    * @since 0.0.1
    */
-  compareOperator: CompareOperator;
+  compareOperator: Exclude<
+    CompareOperator,
+    CompareOperator.In | CompareOperator.IsNull | CompareOperator.IsNotNull
+  >;
   /**
    * The value to compare against.
    *
-   * Pass an array for `CompareOperator.In`.
-   * Not required for `CompareOperator.IsNull` and `CompareOperator.IsNotNull`.
-   *
    * @since 0.0.1
    */
-  value?: string | string[];
+  value: string;
+}
+
+/**
+ * @since 0.1.0
+ */
+export interface FetchFilterInCondition extends BaseFetchFilterCondition {
+  /**
+   * @since 0.1.0
+   */
+  compareOperator: CompareOperator.In;
+  /**
+   * The values to compare against.
+   *
+   * @since 0.1.0
+   */
+  value: string[];
+}
+
+/**
+ * @since 0.1.0
+ */
+export interface FetchFilterNullCondition extends BaseFetchFilterCondition {
+  /**
+   * @since 0.1.0
+   */
+  compareOperator: CompareOperator.IsNull | CompareOperator.IsNotNull;
 }
 
 /**

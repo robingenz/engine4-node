@@ -34,7 +34,7 @@ The type of `SaveAllResult.items` now depends on `returnType`: an empty array fo
 
 ### `FetchFilterOptions`
 
-`FetchFilterOptions` is now a union of `FetchFilterCondition` and `FetchFilterGroup` to support nested filter groups.
+`FetchFilterOptions` is now a union of `FetchFilterCondition` and `FetchFilterGroup` to support nested filter groups. The type of `value` now depends on `compareOperator`: `string[]` for `In`, no value for `IsNull` and `IsNotNull`, and `string` otherwise.
 
 ### `CompareOperator.IsNull`
 
