@@ -11,7 +11,34 @@ export interface ENGINE4Options {
 /**
  * @since 0.0.1
  */
-export interface AuthenticateOptions {
+export type AuthenticateOptions =
+  PasswordAuthenticateOptions | ClientCredentialsAuthenticateOptions;
+
+/**
+ * @since 0.1.0
+ */
+export interface BaseAuthenticateOptions {
+  /**
+   * The client id of the user to authenticate.
+   *
+   * @since 0.0.1
+   */
+  clientId: string;
+  /**
+   * Whether a refresh token should be returned.
+   *
+   * @since 0.1.0
+   * @default false
+   */
+  withRefreshToken?: boolean;
+}
+
+/**
+ * Authenticate with username and password (`password` grant).
+ *
+ * @since 0.1.0
+ */
+export interface PasswordAuthenticateOptions extends BaseAuthenticateOptions {
   /**
    * The username of the user to authenticate.
    *
@@ -24,12 +51,20 @@ export interface AuthenticateOptions {
    * @since 0.0.1
    */
   password: string;
+}
+
+/**
+ * Authenticate with a client secret (`client_credentials` grant).
+ *
+ * @since 0.1.0
+ */
+export interface ClientCredentialsAuthenticateOptions extends BaseAuthenticateOptions {
   /**
-   * The client id of the user to authenticate.
+   * The client secret.
    *
-   * @since 0.0.1
+   * @since 0.1.0
    */
-  clientId: string;
+  clientSecret: string;
 }
 
 /**
@@ -51,9 +86,11 @@ export interface AuthenticateResult {
   /**
    * The refresh token.
    *
+   * Only returned if `withRefreshToken` is `true`.
+   *
    * @since 0.0.1
    */
-  refreshToken: string;
+  refreshToken?: string;
   /**
    * The scope of the token.
    *
@@ -80,6 +117,39 @@ export interface BaseOptions {
 }
 
 /**
+ * @since 0.1.0
+ */
+export interface ConvertCustomDataOptions {
+  /**
+   * If `false`, custom values are returned with their underlying data type
+   * (e.g. `false` or `12`) instead of strings (e.g. `'0'` or `'12'`).
+   *
+   * @since 0.1.0
+   * @default true
+   */
+  convertAllCustomDataToStrings?: boolean;
+}
+
+/**
+ * The type of custom values in results, depending on `convertAllCustomDataToStrings`.
+ *
+ * @since 0.1.0
+ */
+export type CustomValueOf<T extends ConvertCustomDataOptions> =
+  'convertAllCustomDataToStrings' extends keyof T
+    ? false extends T['convertAllCustomDataToStrings']
+      ? CustomValue
+      : string
+    : string;
+
+/**
+ * A custom value with its underlying data type.
+ *
+ * @since 0.1.0
+ */
+export type CustomValue = string | number | boolean | null;
+
+/**
  * @since 0.0.1
  */
 export interface DeleteOptions extends BaseOptions {
@@ -90,7 +160,7 @@ export interface DeleteOptions extends BaseOptions {
    */
   entityId: string;
   /**
-   * The ID of the genric data element to delete.
+   * The ID of the generic data element to delete.
    *
    * @since 0.0.1
    */
@@ -108,7 +178,7 @@ export interface DeleteMultipleOptions extends BaseOptions {
    */
   entityId: string;
   /**
-   * The IDs of the genric data elements to delete.
+   * The IDs of the generic data elements to delete.
    *
    * @since 0.0.3
    */
@@ -118,13 +188,22 @@ export interface DeleteMultipleOptions extends BaseOptions {
 /**
  * @since 0.0.1
  */
-export interface FetchOptions extends BaseOptions {
+export interface FetchOptions extends BaseOptions, ConvertCustomDataOptions {
   /**
    * The ID of the entity to retrieve data from.
    *
    * @since 0.0.1
    */
   entityId: string;
+  /**
+   * The ID of a view to retrieve data through.
+   *
+   * If set, the results contain the fields of the view (including linked fields)
+   * instead of all properties of the entity.
+   *
+   * @since 0.1.0
+   */
+  viewId?: string;
   /**
    * @since 0.0.1
    */
@@ -154,27 +233,53 @@ export interface FetchOptions extends BaseOptions {
    */
   take?: number;
   /**
+   * Whether the `CustomMax_XXX` values are returned.
+   *
    * @since 0.0.1
    */
   withLongValues?: boolean;
 }
 
 /**
+ * A single filter condition or a group of nested filters.
+ *
  * @since 0.0.1
  */
-export interface FetchFilterOptions {
+export type FetchFilterOptions = FetchFilterCondition | FetchFilterGroup;
+
+/**
+ * A filter condition. The type of `value` depends on the `compareOperator`.
+ *
+ * @since 0.1.0
+ */
+export type FetchFilterCondition =
+  FetchFilterValueCondition | FetchFilterInCondition | FetchFilterNullCondition;
+
+/**
+ * @since 0.1.0
+ */
+export interface BaseFetchFilterCondition {
   /**
-   * The name of the generc column to filter on.
+   * The name of the generic column to filter on.
    *
    * @since 0.0.1
    */
   genericName: GenericColumnName;
+}
+
+/**
+ * @since 0.1.0
+ */
+export interface FetchFilterValueCondition extends BaseFetchFilterCondition {
   /**
    * The operator to use to filter the results.
    *
    * @since 0.0.1
    */
-  compareOperator: CompareOperator;
+  compareOperator: Exclude<
+    CompareOperator,
+    CompareOperator.In | CompareOperator.IsNull | CompareOperator.IsNotNull
+  >;
   /**
    * The value to compare against.
    *
@@ -184,11 +289,55 @@ export interface FetchFilterOptions {
 }
 
 /**
+ * @since 0.1.0
+ */
+export interface FetchFilterInCondition extends BaseFetchFilterCondition {
+  /**
+   * @since 0.1.0
+   */
+  compareOperator: CompareOperator.In;
+  /**
+   * The values to compare against.
+   *
+   * @since 0.1.0
+   */
+  value: string[];
+}
+
+/**
+ * @since 0.1.0
+ */
+export interface FetchFilterNullCondition extends BaseFetchFilterCondition {
+  /**
+   * @since 0.1.0
+   */
+  compareOperator: CompareOperator.IsNull | CompareOperator.IsNotNull;
+}
+
+/**
+ * @since 0.1.0
+ */
+export interface FetchFilterGroup {
+  /**
+   * How the filters of the group are combined.
+   *
+   * @since 0.1.0
+   */
+  logic: 'AND' | 'OR';
+  /**
+   * The filters of the group. Groups can be nested.
+   *
+   * @since 0.1.0
+   */
+  groups: FetchFilterOptions[];
+}
+
+/**
  * @since 0.0.1
  */
 export interface FetchSortingOptions {
   /**
-   * The name of the generc column to sort by.
+   * The name of the generic column to sort by.
    *
    * @since 0.0.1
    */
@@ -205,19 +354,19 @@ export interface FetchSortingOptions {
 /**
  * @since 0.0.1
  */
-export interface FetchResult {
+export interface FetchResult<TValue extends CustomValue = string> {
   /**
    * The fetched generic data elements.
    *
    * @since 0.0.1
    */
-  items: GenericDataElement[];
+  items: GenericDataElement<TValue>[];
 }
 
 /**
  * @since 0.0.1
  */
-export interface GetOptions extends BaseOptions {
+export interface GetOptions extends BaseOptions, ConvertCustomDataOptions {
   /**
    * The ID of the entity to retrieve data from.
    *
@@ -225,7 +374,7 @@ export interface GetOptions extends BaseOptions {
    */
   entityId: string;
   /**
-   * The ID of the genric data element to retrieve.
+   * The ID of the generic data element to retrieve.
    *
    * @since 0.0.1
    */
@@ -235,19 +384,19 @@ export interface GetOptions extends BaseOptions {
 /**
  * @since 0.0.1
  */
-export interface GetResult {
+export interface GetResult<TValue extends CustomValue = string> {
   /**
    * The fetched generic data element.
    *
    * @since 0.0.1
    */
-  item: GenericDataElement;
+  item: GenericDataElement<TValue>;
 }
 
 /**
  * @since 0.0.3
  */
-export interface GetMultipleOptions extends BaseOptions {
+export interface GetMultipleOptions extends BaseOptions, ConvertCustomDataOptions {
   /**
    * The ID of the entity to retrieve data from.
    *
@@ -255,7 +404,7 @@ export interface GetMultipleOptions extends BaseOptions {
    */
   entityId: string;
   /**
-   * The IDs of the genric data elements to retrieve.
+   * The IDs of the generic data elements to retrieve.
    *
    * @since 0.0.3
    */
@@ -263,15 +412,15 @@ export interface GetMultipleOptions extends BaseOptions {
 }
 
 /**
- * @since 0.0.1
+ * @since 0.0.3
  */
-export interface GetMultipleResult {
+export interface GetMultipleResult<TValue extends CustomValue = string> {
   /**
    * The fetched generic data elements.
    *
-   * @since 0.0.1
+   * @since 0.0.3
    */
-  items: GenericDataElement[];
+  items: GenericDataElement<TValue>[];
 }
 
 /**
@@ -281,32 +430,57 @@ export interface SaveAllOptions extends BaseOptions {
   /**
    * The generic data elements to save.
    *
+   * If a `DataId` is provided and exists, the element is updated.
+   * Otherwise, a new element is created.
+   *
    * @since 0.0.1
    */
-  items: GenericDataElement[];
+  items: SaveItem[];
   /**
    * The return type of the saved generic data elements.
    *
    * @since 0.0.1
    * @default 'none'
    */
-  returnType?: 'none' | 'dataId' | 'full';
+  returnType?: SaveAllReturnType;
 }
+
+/**
+ * @since 0.1.0
+ */
+export type SaveAllReturnType = 'none' | 'dataId' | 'full';
+
+/**
+ * A generic data element to save. Only `EntityId` is required.
+ *
+ * @since 0.1.0
+ */
+export type SaveItem = Partial<GenericDataElement<CustomValue>> &
+  Pick<GenericDataElement, 'EntityId'>;
 
 /**
  * @since 0.0.1
  */
-export interface SaveAllResult {
+export interface SaveAllResult<TReturnType extends SaveAllReturnType | undefined = undefined> {
   /**
    * The saved generic data elements.
    *
-   * If `returnType` is set to `none`, this will be an empty array.
-   * If `returnType` is set to `dataId`, only `dataId` and `entityId` will be returned.
+   * Empty if `returnType` is `none`.
+   * Only `DataId` and `EntityId` if `returnType` is `dataId`.
    *
    * @since 0.0.1
    */
-  items: GenericDataElement[];
+  items: TReturnType extends 'full'
+    ? GenericDataElement[]
+    : TReturnType extends 'dataId'
+      ? SavedItemReference[]
+      : [];
 }
+
+/**
+ * @since 0.1.0
+ */
+export type SavedItemReference = Pick<GenericDataElement, 'DataId' | 'EntityId'>;
 
 /**
  * @since 0.0.4
@@ -330,6 +504,18 @@ export interface FetchAttachmentResult {
    * @since 0.0.4
    */
   item: Buffer;
+  /**
+   * The file name of the attachment, if provided by the server.
+   *
+   * @since 0.1.0
+   */
+  filename?: string;
+  /**
+   * The MIME type of the attachment, if provided by the server.
+   *
+   * @since 0.1.0
+   */
+  mimeType?: string;
 }
 
 /**
@@ -340,7 +526,13 @@ export type GenericColumnName = keyof GenericDataElement;
 /**
  * @since 0.0.1
  */
-export interface GenericDataElement {
+export interface GenericDataElement<TValue extends CustomValue = string> {
+  /**
+   * The display text of a dropdown (lookup) value, e.g. `Custom_004_DisplayValue`.
+   *
+   * @since 0.1.0
+   */
+  [displayValue: `Custom_${string}_DisplayValue`]: string | undefined;
   /**
    * @since 0.0.1
    */
@@ -350,805 +542,811 @@ export interface GenericDataElement {
    */
   CreatedById?: string;
   /**
+   * The creation date in ISO 8601 format.
+   *
+   * @since 0.1.0
+   */
+  CreatedDate?: string;
+  /**
    * @since 0.0.1
    */
-  Custom_001?: string;
+  Custom_001?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_002?: string;
+  Custom_002?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_003?: string;
+  Custom_003?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_004?: string;
+  Custom_004?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_005?: string;
+  Custom_005?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_006?: string;
+  Custom_006?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_007?: string;
+  Custom_007?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_008?: string;
+  Custom_008?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_009?: string;
+  Custom_009?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_010?: string;
+  Custom_010?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_011?: string;
+  Custom_011?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_012?: string;
+  Custom_012?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_013?: string;
+  Custom_013?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_014?: string;
+  Custom_014?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_015?: string;
+  Custom_015?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_016?: string;
+  Custom_016?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_017?: string;
+  Custom_017?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_018?: string;
+  Custom_018?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_019?: string;
+  Custom_019?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_020?: string;
+  Custom_020?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_021?: string;
+  Custom_021?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_022?: string;
+  Custom_022?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_023?: string;
+  Custom_023?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_024?: string;
+  Custom_024?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_025?: string;
+  Custom_025?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_026?: string;
+  Custom_026?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_027?: string;
+  Custom_027?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_028?: string;
+  Custom_028?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_029?: string;
+  Custom_029?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_030?: string;
+  Custom_030?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_031?: string;
+  Custom_031?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_032?: string;
+  Custom_032?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_033?: string;
+  Custom_033?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_034?: string;
+  Custom_034?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_035?: string;
+  Custom_035?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_036?: string;
+  Custom_036?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_037?: string;
+  Custom_037?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_038?: string;
+  Custom_038?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_039?: string;
+  Custom_039?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_040?: string;
+  Custom_040?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_041?: string;
+  Custom_041?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_042?: string;
+  Custom_042?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_043?: string;
+  Custom_043?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_044?: string;
+  Custom_044?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_045?: string;
+  Custom_045?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_046?: string;
+  Custom_046?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_047?: string;
+  Custom_047?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_048?: string;
+  Custom_048?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_049?: string;
+  Custom_049?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_050?: string;
+  Custom_050?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_051?: string;
+  Custom_051?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_052?: string;
+  Custom_052?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_053?: string;
+  Custom_053?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_054?: string;
+  Custom_054?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_055?: string;
+  Custom_055?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_056?: string;
+  Custom_056?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_057?: string;
+  Custom_057?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_058?: string;
+  Custom_058?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_059?: string;
+  Custom_059?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_060?: string;
+  Custom_060?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_061?: string;
+  Custom_061?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_062?: string;
+  Custom_062?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_063?: string;
+  Custom_063?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_064?: string;
+  Custom_064?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_065?: string;
+  Custom_065?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_066?: string;
+  Custom_066?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_067?: string;
+  Custom_067?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_068?: string;
+  Custom_068?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_069?: string;
+  Custom_069?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_070?: string;
+  Custom_070?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_071?: string;
+  Custom_071?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_072?: string;
+  Custom_072?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_073?: string;
+  Custom_073?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_074?: string;
+  Custom_074?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_075?: string;
+  Custom_075?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_076?: string;
+  Custom_076?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_077?: string;
+  Custom_077?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_078?: string;
+  Custom_078?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_079?: string;
+  Custom_079?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_080?: string;
+  Custom_080?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_081?: string;
+  Custom_081?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_082?: string;
+  Custom_082?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_083?: string;
+  Custom_083?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_084?: string;
+  Custom_084?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_085?: string;
+  Custom_085?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_086?: string;
+  Custom_086?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_087?: string;
+  Custom_087?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_088?: string;
+  Custom_088?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_089?: string;
+  Custom_089?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_090?: string;
+  Custom_090?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_091?: string;
+  Custom_091?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_092?: string;
+  Custom_092?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_093?: string;
+  Custom_093?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_094?: string;
+  Custom_094?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_095?: string;
+  Custom_095?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_096?: string;
+  Custom_096?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_097?: string;
+  Custom_097?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_098?: string;
+  Custom_098?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_099?: string;
+  Custom_099?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_100?: string;
+  Custom_100?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_101?: string;
+  Custom_101?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_102?: string;
+  Custom_102?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_103?: string;
+  Custom_103?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_104?: string;
+  Custom_104?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_105?: string;
+  Custom_105?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_106?: string;
+  Custom_106?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_107?: string;
+  Custom_107?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_108?: string;
+  Custom_108?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_109?: string;
+  Custom_109?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_110?: string;
+  Custom_110?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_111?: string;
+  Custom_111?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_112?: string;
+  Custom_112?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_113?: string;
+  Custom_113?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_114?: string;
+  Custom_114?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_115?: string;
+  Custom_115?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_116?: string;
+  Custom_116?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_117?: string;
+  Custom_117?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_118?: string;
+  Custom_118?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_119?: string;
+  Custom_119?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_120?: string;
+  Custom_120?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_121?: string;
+  Custom_121?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_122?: string;
+  Custom_122?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_123?: string;
+  Custom_123?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_124?: string;
+  Custom_124?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_125?: string;
+  Custom_125?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_126?: string;
+  Custom_126?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_127?: string;
+  Custom_127?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_128?: string;
+  Custom_128?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_129?: string;
+  Custom_129?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_130?: string;
+  Custom_130?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_131?: string;
+  Custom_131?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_132?: string;
+  Custom_132?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_133?: string;
+  Custom_133?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_134?: string;
+  Custom_134?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_135?: string;
+  Custom_135?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_136?: string;
+  Custom_136?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_137?: string;
+  Custom_137?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_138?: string;
+  Custom_138?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_139?: string;
+  Custom_139?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_140?: string;
+  Custom_140?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_141?: string;
+  Custom_141?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_142?: string;
+  Custom_142?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_143?: string;
+  Custom_143?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_144?: string;
+  Custom_144?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_145?: string;
+  Custom_145?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_146?: string;
+  Custom_146?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_147?: string;
+  Custom_147?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_148?: string;
+  Custom_148?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_149?: string;
+  Custom_149?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_150?: string;
+  Custom_150?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_151?: string;
+  Custom_151?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_152?: string;
+  Custom_152?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_153?: string;
+  Custom_153?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_154?: string;
+  Custom_154?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_155?: string;
+  Custom_155?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_156?: string;
+  Custom_156?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_157?: string;
+  Custom_157?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_158?: string;
+  Custom_158?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_159?: string;
+  Custom_159?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_160?: string;
+  Custom_160?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_161?: string;
+  Custom_161?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_162?: string;
+  Custom_162?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_163?: string;
+  Custom_163?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_164?: string;
+  Custom_164?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_165?: string;
+  Custom_165?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_166?: string;
+  Custom_166?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_167?: string;
+  Custom_167?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_168?: string;
+  Custom_168?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_169?: string;
+  Custom_169?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_170?: string;
+  Custom_170?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_171?: string;
+  Custom_171?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_172?: string;
+  Custom_172?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_173?: string;
+  Custom_173?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_174?: string;
+  Custom_174?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_175?: string;
+  Custom_175?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_176?: string;
+  Custom_176?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_177?: string;
+  Custom_177?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_178?: string;
+  Custom_178?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_179?: string;
+  Custom_179?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_180?: string;
+  Custom_180?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_181?: string;
+  Custom_181?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_182?: string;
+  Custom_182?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_183?: string;
+  Custom_183?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_184?: string;
+  Custom_184?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_185?: string;
+  Custom_185?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_186?: string;
+  Custom_186?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_187?: string;
+  Custom_187?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_188?: string;
+  Custom_188?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_189?: string;
+  Custom_189?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_190?: string;
+  Custom_190?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_191?: string;
+  Custom_191?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_192?: string;
+  Custom_192?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_193?: string;
+  Custom_193?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_194?: string;
+  Custom_194?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_195?: string;
+  Custom_195?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_196?: string;
+  Custom_196?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_197?: string;
+  Custom_197?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_198?: string;
+  Custom_198?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_199?: string;
+  Custom_199?: TValue;
   /**
    * @since 0.0.1
    */
-  Custom_200?: string;
+  Custom_200?: TValue;
   /**
    * @since 0.0.1
    */
@@ -1178,13 +1376,35 @@ export interface GenericDataElement {
    */
   DataId: string;
   /**
+   * The display text of the element.
+   *
+   * @since 0.1.0
+   */
+  DisplayValue?: string;
+  /**
    * @since 0.0.1
    */
   EntityId: string;
   /**
+   * The entry time in ISO 8601 format.
+   *
+   * @since 0.1.0
+   */
+  EntryTime?: string;
+  /**
+   * Whether the user has write access to the element.
+   *
+   * @since 0.1.0
+   */
+  HasWriteAccess?: boolean;
+  /**
    * @since 0.0.1
    */
   IsActive: boolean;
+  /**
+   * @since 0.1.0
+   */
+  MandatorId?: string;
   /**
    * @since 0.0.1
    */
@@ -1194,9 +1414,29 @@ export interface GenericDataElement {
    */
   ModifiedById?: string;
   /**
+   * The modification date in ISO 8601 format.
+   *
+   * @since 0.1.0
+   */
+  ModifiedDate?: string;
+  /**
+   * @since 0.1.0
+   */
+  OrgUnitId?: string;
+  /**
+   * @since 0.1.0
+   */
+  TriggerStamp?: string;
+  /**
    * @since 0.0.1
    */
   UserId: string;
+  /**
+   * The display name of the user.
+   *
+   * @since 0.1.0
+   */
+  UserDisplayName?: string;
 }
 
 export enum CompareOperator {
@@ -1208,7 +1448,7 @@ export enum CompareOperator {
   GreaterThanOrEqualTo = '>=',
   Like = 'LIKE',
   Contains = 'CONTAINS',
-  IsNull = 'isNull',
+  IsNull = 'ISNULL',
   IsNotNull = 'ISNOTNULL',
   In = 'IN',
 }

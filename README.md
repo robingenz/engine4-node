@@ -41,6 +41,17 @@ const authenticate = async () => {
 };
 ```
 
+Alternatively, authenticate with client credentials:
+
+```typescript
+const { accessToken } = await engine4.authenticate({
+  clientId: 'my_client_id',
+  clientSecret: 'my_client_secret',
+});
+```
+
+Pass `withRefreshToken: true` to also receive a `refreshToken`.
+
 The access token is required for the following calls.
 
 Here you can find examples for deleting, querying, inserting and updating records:
@@ -130,13 +141,52 @@ const fetchAttachment = async () => {
 
 const fetchAndSaveAttachment = async () => {
   const { writeFile } = await import('node:fs/promises');
+  const { basename } = await import('node:path');
 
-  const { item } = await engine4.fetchAttachment({
+  const { item, filename } = await engine4.fetchAttachment({
     accessToken,
     dataId: 'ea10248d-1fe8-4baf-84d7-d18a64106b40',
   });
-  await writeFile('test.pdf', item);
+  // Strip directories from the server-provided file name to prevent path traversal.
+  await writeFile(basename(filename ?? 'attachment'), item);
 };
+```
+
+### Filter groups
+
+Filters can be combined with `AND`/`OR` logic and nested as deep as needed:
+
+```typescript
+const { items } = await engine4.fetch({
+  accessToken,
+  entityId: '7130fa8b-4040-40d0-b97b-a9006fc140ec',
+  filter: {
+    logic: 'AND',
+    groups: [
+      { genericName: 'Custom_001', compareOperator: CompareOperator.In, value: ['a', 'b'] },
+      {
+        logic: 'OR',
+        groups: [
+          { genericName: 'Custom_002', compareOperator: CompareOperator.GreaterThan, value: '10' },
+          { genericName: 'Custom_003', compareOperator: CompareOperator.IsNull },
+        ],
+      },
+    ],
+  },
+});
+```
+
+### Typed values
+
+By default, all custom values are returned as strings. Set `convertAllCustomDataToStrings` to `false` on `fetch`, `get` or `getMultiple` to receive their underlying data types (e.g. `false` or `12`):
+
+```typescript
+const { item } = await engine4.get({
+  accessToken,
+  entityId: '39aeedee-91e3-4ec4-b7bb-b5a036601f9f',
+  dataId: '3c7d04f7-74e6-4cfd-9fd6-233c6f4ded8a',
+  convertAllCustomDataToStrings: false,
+});
 ```
 
 ### Error handling

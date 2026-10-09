@@ -23,3 +23,19 @@ Failed requests now throw an `ENGINE4Error` with the HTTP `status`, `statusText`
 ### `ENGINE4Interface`
 
 The `ENGINE4Interface` type has been removed. Use the `ENGINE4` class type instead.
+
+### `authenticate`
+
+`AuthenticateOptions` is now a union of `PasswordAuthenticateOptions` and `ClientCredentialsAuthenticateOptions`. `AuthenticateResult.refreshToken` is now optional and only returned if `withRefreshToken` is `true`.
+
+### `saveAll`
+
+The type of `SaveAllResult.items` now depends on `returnType`: an empty array for `none` (default), `SavedItemReference[]` (`DataId` and `EntityId`) for `dataId`, and `GenericDataElement[]` for `full`. Input items only require `EntityId`.
+
+### `FetchFilterOptions`
+
+`FetchFilterOptions` is now a union of `FetchFilterCondition` and `FetchFilterGroup` to support nested filter groups. The type of `value` now depends on `compareOperator`: `string[]` for `In`, no value for `IsNull` and `IsNotNull`, and `string` otherwise.
+
+### `CompareOperator.IsNull`
+
+The value of `CompareOperator.IsNull` changed from `isNull` to `ISNULL` to match the API documentation.
