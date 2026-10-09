@@ -1,6 +1,6 @@
 import { ENGINE4Error } from './errors';
 
-export type QueryParams = Record<string, string | string[]>;
+export type QueryParams = Record<string, string | string[] | boolean | undefined>;
 
 export interface RequestOptions {
   method: string;
@@ -63,8 +63,11 @@ export class HttpClient {
   private createUrl(path: string, query?: QueryParams): string {
     const url = new URL(path, this.baseUrl);
     for (const [key, value] of Object.entries(query ?? {})) {
+      if (value === undefined) {
+        continue;
+      }
       for (const item of Array.isArray(value) ? value : [value]) {
-        url.searchParams.append(key, item);
+        url.searchParams.append(key, String(item));
       }
     }
     return url.toString();

@@ -34,7 +34,7 @@
     "fmt": "eslint --fix . && prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc -p test",
     "prepublishOnly": "npm run build",
     "prepare": "husky"
   },
