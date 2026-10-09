@@ -159,6 +159,10 @@ try {
 
 See [CHANGELOG.md](https://github.com/robingenz/engine4-node/blob/main/CHANGELOG.md).
 
+## Breaking Changes
+
+See [BREAKING.md](https://github.com/robingenz/engine4-node/blob/main/BREAKING.md).
+
 ## License
 
 See [LICENSE](https://github.com/robingenz/engine4-node/blob/main/LICENSE).
