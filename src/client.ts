@@ -375,13 +375,9 @@ export class ENGINE4 {
       MaxWidth: options.maxWidth,
       ExpectedHash: options.expectedHash,
     };
-    const file =
-      options.file instanceof Blob
-        ? options.file
-        : new Blob([options.file], { type: options.mimeType });
     const body = new FormData();
     body.append('input', JSON.stringify(input));
-    body.append('file', file, options.filename);
+    body.append('file', new Blob([options.file], { type: options.mimeType }), options.filename);
     const result = await this.http.requestJson<UploadResponse>({
       method: 'POST',
       path,

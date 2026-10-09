@@ -285,6 +285,7 @@ describe('ENGINE4', () => {
       MimeType: 'text/plain',
       ExpectedHash: 'h',
     });
+    expect((form.get('file') as File).type).toBe('text/plain');
   });
 
   it('fetches single documents', async () => {
