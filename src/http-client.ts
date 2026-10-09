@@ -8,7 +8,7 @@ export interface RequestOptions {
   accessToken?: string;
   query?: QueryParams;
   /**
-   * Sent as `application/x-www-form-urlencoded` if `URLSearchParams`, otherwise as JSON.
+   * Sent as is if `URLSearchParams` or `FormData`, otherwise as JSON.
    */
   body?: unknown;
 }
@@ -42,8 +42,8 @@ export class HttpClient {
     if (options.accessToken) {
       headers.Authorization = `Bearer ${options.accessToken}`;
     }
-    let body: URLSearchParams | string | undefined;
-    if (options.body instanceof URLSearchParams) {
+    let body: URLSearchParams | FormData | string | undefined;
+    if (options.body instanceof URLSearchParams || options.body instanceof FormData) {
       body = options.body;
     } else if (options.body !== undefined) {
       headers['Content-Type'] = 'application/json';

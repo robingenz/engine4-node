@@ -519,6 +519,327 @@ export interface FetchAttachmentResult {
 }
 
 /**
+ * @since 0.1.1
+ */
+export interface UploadFileOptions extends BaseOptions {
+  /**
+   * The file content.
+   *
+   * @since 0.1.1
+   */
+  file: Blob | Uint8Array;
+  /**
+   * The file name.
+   *
+   * @since 0.1.1
+   * @example 'invoice.pdf'
+   */
+  filename: string;
+  /**
+   * The MIME type of the file.
+   *
+   * @since 0.1.1
+   * @example 'application/pdf'
+   */
+  mimeType: string;
+  /**
+   * The maximum width of an image in pixels.
+   *
+   * Wider images are scaled down to this width.
+   *
+   * @since 0.1.1
+   */
+  maxWidth?: number;
+  /**
+   * The expected SHA-256 hash of the file.
+   *
+   * If the hash of the uploaded file does not match, the upload is rejected.
+   *
+   * @since 0.1.1
+   */
+  expectedHash?: string;
+}
+
+/**
+ * @since 0.1.1
+ */
+export interface UploadFileResult {
+  /**
+   * The ID of the saved file.
+   *
+   * @since 0.1.1
+   */
+  dataId: string;
+}
+
+/**
+ * @since 0.1.1
+ */
+export interface SaveAttachmentOptions extends UploadFileOptions {
+  /**
+   * The ID of the entity of the record to attach the file to.
+   *
+   * @since 0.1.1
+   */
+  parentEntityId: string;
+  /**
+   * The ID of the record to attach the file to.
+   *
+   * @since 0.1.1
+   */
+  parentDataId: string;
+  /**
+   * The ID to use for the attachment.
+   *
+   * @since 0.1.1
+   */
+  dataId?: string;
+}
+
+/**
+ * @since 0.1.1
+ */
+export type SaveAttachmentResult = UploadFileResult;
+
+/**
+ * @since 0.1.1
+ */
+export interface FetchSingleDocumentOptions extends BaseOptions {
+  /**
+   * The ID of the entity of the record.
+   *
+   * @since 0.1.1
+   */
+  entityId: string;
+  /**
+   * The ID of the record.
+   *
+   * @since 0.1.1
+   */
+  dataId: string;
+  /**
+   * The name of the single document column.
+   *
+   * @since 0.1.1
+   * @example 'Custom_021'
+   */
+  columnName: GenericColumnName;
+}
+
+/**
+ * @since 0.1.1
+ */
+export type FetchSingleDocumentResult = FetchAttachmentResult;
+
+/**
+ * @since 0.1.1
+ */
+export interface SaveSingleDocumentOptions extends UploadFileOptions {
+  /**
+   * The ID of the entity of the record.
+   *
+   * @since 0.1.1
+   */
+  entityId: string;
+  /**
+   * The ID of the record.
+   *
+   * @since 0.1.1
+   */
+  dataId: string;
+  /**
+   * The name of the single document column.
+   *
+   * @since 0.1.1
+   * @example 'Custom_021'
+   */
+  columnName: GenericColumnName;
+}
+
+/**
+ * @since 0.1.1
+ */
+export type SaveSingleDocumentResult = UploadFileResult;
+
+/**
+ * An entity the user has access to.
+ *
+ * The response shape is not documented by ENGINE4.
+ *
+ * @since 0.1.1
+ */
+export type GenericEntity = Record<string, unknown>;
+
+/**
+ * @since 0.1.1
+ */
+export interface GetGenericEntitiesResult {
+  /**
+   * @since 0.1.1
+   */
+  items: GenericEntity[];
+}
+
+/**
+ * @since 0.1.1
+ */
+export interface GetGenericPropertiesOptions extends BaseOptions {
+  /**
+   * The ID of the entity.
+   *
+   * @since 0.1.1
+   */
+  entityId: string;
+}
+
+/**
+ * @since 0.1.1
+ */
+export interface GenericProperty {
+  /**
+   * @since 0.1.1
+   */
+  EntityId: string;
+  /**
+   * @since 0.1.1
+   */
+  PropertyId: string;
+  /**
+   * The generic column name, e.g. `Custom_012`.
+   *
+   * @since 0.1.1
+   */
+  GenericColumnName: string;
+  /**
+   * The display name of the property.
+   *
+   * @since 0.1.1
+   */
+  PropertyName: string;
+  /**
+   * The data type, e.g. `nvarchar`, `int`, `decimal`, `bit`, `dropdown`, `datetime`, `date` or `time`.
+   *
+   * @since 0.1.1
+   */
+  DataType: string;
+  /**
+   * The maximum length of an `nvarchar` property.
+   *
+   * @since 0.1.1
+   */
+  Size: number | null;
+  /**
+   * The number of decimal places of a `decimal` property.
+   *
+   * @since 0.1.1
+   */
+  Precision: number | null;
+  /**
+   * The maximum length of an `int` property or the number of integer digits of a `decimal` property.
+   *
+   * @since 0.1.1
+   */
+  Scale: number | null;
+  /**
+   * Whether a `datetime` property is stored in UTC or local time.
+   *
+   * @since 0.1.1
+   */
+  IsUtc: boolean;
+  /**
+   * Whether the property is required.
+   *
+   * @since 0.1.1
+   */
+  IsRequired: boolean;
+  /**
+   * The ID of the referenced entity of a `dropdown` property.
+   *
+   * @since 0.1.1
+   */
+  LookupEntityId: string | null;
+}
+
+/**
+ * @since 0.1.1
+ */
+export interface GetGenericPropertiesResult {
+  /**
+   * @since 0.1.1
+   */
+  items: GenericProperty[];
+}
+
+/**
+ * @since 0.1.1
+ */
+export interface GetGenericViewsOptions extends BaseOptions {
+  /**
+   * The ID of the entity.
+   *
+   * @since 0.1.1
+   */
+  entityId: string;
+  /**
+   * Only return views of this type.
+   *
+   * @since 0.1.1
+   * @example 'List'
+   */
+  viewType?: string;
+}
+
+/**
+ * A view of an entity.
+ *
+ * The response shape is not documented by ENGINE4.
+ *
+ * @since 0.1.1
+ */
+export type GenericView = Record<string, unknown>;
+
+/**
+ * @since 0.1.1
+ */
+export interface GetGenericViewsResult {
+  /**
+   * @since 0.1.1
+   */
+  items: GenericView[];
+}
+
+/**
+ * @since 0.1.1
+ */
+export interface GetGenericViewFieldsOptions extends BaseOptions {
+  /**
+   * The ID of the view.
+   *
+   * @since 0.1.1
+   */
+  viewId: string;
+}
+
+/**
+ * A field of a view.
+ *
+ * The response shape is not documented by ENGINE4.
+ *
+ * @since 0.1.1
+ */
+export type GenericViewField = Record<string, unknown>;
+
+/**
+ * @since 0.1.1
+ */
+export interface GetGenericViewFieldsResult {
+  /**
+   * @since 0.1.1
+   */
+  items: GenericViewField[];
+}
+
+/**
  * @since 0.0.1
  */
 export type GenericColumnName = keyof GenericDataElement;
