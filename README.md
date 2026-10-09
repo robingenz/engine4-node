@@ -15,7 +15,7 @@ Use [npm](https://docs.npmjs.com/cli/) to install the package:
 npm install engine4-node
 ```
 
-Requires Node.js 20.19 or later. The package is ESM-only.
+Requires Node.js 22.12 or later. The package is ESM-only.
 
 ## Usage
 

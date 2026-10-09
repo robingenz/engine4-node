@@ -12,9 +12,9 @@ This is a comprehensive list of the breaking changes introduced in the major ver
 
 The package is now published as ES module only. Use `import { ENGINE4 } from 'engine4-node'` instead of `require('engine4-node')`.
 
-### Node.js 20.19
+### Node.js 22.12
 
-The minimum supported Node.js version is now 20.19. The package now uses the native `fetch` API instead of `node-fetch`.
+The minimum supported Node.js version is now 22.12. The package now uses the native `fetch` API instead of `node-fetch`.
 
 ### `ENGINE4Error`
 
