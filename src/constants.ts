@@ -7,4 +7,11 @@ export const ENDPOINTS = {
   GET_MULTIPLE: '/webapi/external/getMultiple',
   SAVE_ALL: '/webapi/external/saveAll',
   FETCH_ATTACHMENT: '/webapi/external/fetchAttachment',
+  SAVE_ATTACHMENT: '/webapi/external/saveAttachmentFormData',
+  FETCH_SINGLE_DOCUMENT: '/webapi/external/fetchSingleDocument',
+  SAVE_SINGLE_DOCUMENT: '/webapi/external/saveSingleDocumentFormData',
+  GET_GENERIC_ENTITIES: '/webapi/external/GetGenericEntities',
+  GET_GENERIC_PROPERTIES: '/webapi/external/GetGenericProperties',
+  GET_GENERIC_VIEWS: '/webapi/external/GetGenericViews',
+  GET_GENERIC_VIEW_FIELDS: '/webapi/external/GetGenericViewFields',
 };

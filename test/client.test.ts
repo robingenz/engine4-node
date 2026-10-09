@@ -235,6 +235,99 @@ describe('ENGINE4', () => {
     expect(result.filename).toBe('a.pdf');
   });
 
+  it('uploads attachments as multipart form data', async () => {
+    const { getLastRequest } = mockFetchJson({ DataId: 'a' });
+
+    const result = await client.saveAttachment({
+      accessToken,
+      parentEntityId: 'e',
+      parentDataId: 'd',
+      file: new Uint8Array([1, 2, 3]),
+      filename: 'a.txt',
+      mimeType: 'text/plain',
+    });
+
+    const { url, init } = getLastRequest();
+    const form = init.body as FormData;
+    const file = form.get('file') as File;
+    expect(url).toBe('https://example.engine4.io/webapi/external/saveAttachmentFormData');
+    expect(JSON.parse(form.get('input') as string)).toEqual({
+      ParentEntityId: 'e',
+      ParentDataId: 'd',
+      Filename: 'a.txt',
+      MimeType: 'text/plain',
+    });
+    expect(file.name).toBe('a.txt');
+    expect(new Uint8Array(await file.arrayBuffer())).toEqual(new Uint8Array([1, 2, 3]));
+    expect(result).toEqual({ dataId: 'a' });
+  });
+
+  it('uploads single documents', async () => {
+    const { getLastRequest } = mockFetchJson({ DataId: 'a' });
+
+    await client.saveSingleDocument({
+      accessToken,
+      entityId: 'e',
+      dataId: 'd',
+      columnName: 'Custom_021',
+      file: new Blob(['x']),
+      filename: 'a.txt',
+      mimeType: 'text/plain',
+      expectedHash: 'h',
+    });
+
+    const form = getLastRequest().init.body as FormData;
+    expect(JSON.parse(form.get('input') as string)).toEqual({
+      EntityId: 'e',
+      DataId: 'd',
+      ColumnName: 'Custom_021',
+      Filename: 'a.txt',
+      MimeType: 'text/plain',
+      ExpectedHash: 'h',
+    });
+  });
+
+  it('fetches single documents', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(new Uint8Array([1]))),
+    );
+
+    const result = await client.fetchSingleDocument({
+      accessToken,
+      entityId: 'e',
+      dataId: 'd',
+      columnName: 'Custom_021',
+    });
+
+    expect(result.item).toEqual(Buffer.from([1]));
+  });
+
+  it('fetches entity metadata', async () => {
+    const { getLastRequest } = mockFetchJson([{ PropertyName: 'Name' }]);
+
+    const properties = await client.getGenericProperties({ accessToken, entityId: 'e' });
+    expect(getLastRequest().url).toBe(
+      'https://example.engine4.io/webapi/external/GetGenericProperties?entityId=e',
+    );
+    expect(properties.items).toEqual([{ PropertyName: 'Name' }]);
+
+    await client.getGenericEntities({ accessToken });
+    expect(getLastRequest().url).toBe(
+      'https://example.engine4.io/webapi/external/GetGenericEntities',
+    );
+
+    await client.getGenericViews({ accessToken, entityId: 'e', viewType: 'List' });
+    expect(getLastRequest().url).toBe(
+      'https://example.engine4.io/webapi/external/GetGenericViews?entityId=e&viewType=List',
+    );
+
+    await client.getGenericViewFields({ accessToken, viewId: 'v' });
+    expect(getLastRequest().url).toBe(
+      'https://example.engine4.io/webapi/external/GetGenericViewFields?viewId=v',
+    );
+  });
+
   it('throws an ENGINE4Error with the parsed body on failure', async () => {
     mockFetchJson({ message: 'Not found' }, 404);
 

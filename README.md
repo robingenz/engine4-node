@@ -152,6 +152,48 @@ const fetchAndSaveAttachment = async () => {
 };
 ```
 
+### Uploading files
+
+Attach a file to a record or save it to a single document column:
+
+```typescript
+import { readFile } from 'node:fs/promises';
+
+const file = await readFile('invoice.pdf');
+
+const { dataId } = await engine4.saveAttachment({
+  accessToken,
+  parentEntityId: '39aeedee-91e3-4ec4-b7bb-b5a036601f9f',
+  parentDataId: '3c7d04f7-74e6-4cfd-9fd6-233c6f4ded8a',
+  file,
+  filename: 'invoice.pdf',
+  mimeType: 'application/pdf',
+});
+
+await engine4.saveSingleDocument({
+  accessToken,
+  entityId: '39aeedee-91e3-4ec4-b7bb-b5a036601f9f',
+  dataId: '3c7d04f7-74e6-4cfd-9fd6-233c6f4ded8a',
+  columnName: 'Custom_021',
+  file,
+  filename: 'invoice.pdf',
+  mimeType: 'application/pdf',
+});
+```
+
+Single documents are fetched with `fetchSingleDocument`, which returns the same result as `fetchAttachment`.
+
+### Metadata
+
+List the entities you have access to, as well as the properties, views and view fields of an entity:
+
+```typescript
+const { items: entities } = await engine4.getGenericEntities({ accessToken });
+const { items: properties } = await engine4.getGenericProperties({ accessToken, entityId });
+const { items: views } = await engine4.getGenericViews({ accessToken, entityId, viewType: 'List' });
+const { items: fields } = await engine4.getGenericViewFields({ accessToken, viewId });
+```
+
 ### Filter groups
 
 Filters can be combined with `AND`/`OR` logic and nested as deep as needed:

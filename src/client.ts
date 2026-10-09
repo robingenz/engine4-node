@@ -3,6 +3,7 @@ import { HttpClient } from './http-client';
 import type {
   AuthenticateOptions,
   AuthenticateResult,
+  BaseOptions,
   CustomValueOf,
   DeleteMultipleOptions,
   DeleteOptions,
@@ -12,14 +13,33 @@ import type {
   FetchFilterOptions,
   FetchOptions,
   FetchResult,
+  FetchSingleDocumentOptions,
+  FetchSingleDocumentResult,
   GenericDataElement,
+  GenericEntity,
+  GenericProperty,
+  GenericView,
+  GenericViewField,
+  GetGenericEntitiesResult,
+  GetGenericPropertiesOptions,
+  GetGenericPropertiesResult,
+  GetGenericViewFieldsOptions,
+  GetGenericViewFieldsResult,
+  GetGenericViewsOptions,
+  GetGenericViewsResult,
   GetMultipleOptions,
   GetMultipleResult,
   GetOptions,
   GetResult,
   SaveAllOptions,
   SaveAllResult,
+  SaveAttachmentOptions,
+  SaveAttachmentResult,
   SavedItemReference,
+  SaveSingleDocumentOptions,
+  SaveSingleDocumentResult,
+  UploadFileOptions,
+  UploadFileResult,
 } from './types';
 
 interface TokenResponse {
@@ -28,6 +48,10 @@ interface TokenResponse {
   token_type: 'Bearer';
   refresh_token?: string;
   scope: string;
+}
+
+interface UploadResponse {
+  DataId: string;
 }
 
 interface ApiFilter {
@@ -224,12 +248,156 @@ export class ENGINE4 {
       accessToken: options.accessToken,
       query: { dataId: options.dataId },
     });
-    return {
-      item: Buffer.from(await response.arrayBuffer()),
-      filename: parseFilename(response.headers.get('content-disposition')),
-      mimeType: response.headers.get('content-type') ?? undefined,
-    };
+    return toFetchAttachmentResult(response);
   }
+
+  /**
+   * Upload a file and attach it to a record.
+   *
+   * @since 0.1.1
+   */
+  public async saveAttachment(options: SaveAttachmentOptions): Promise<SaveAttachmentResult> {
+    return this.upload(ENDPOINTS.SAVE_ATTACHMENT, options, {
+      ParentEntityId: options.parentEntityId,
+      ParentDataId: options.parentDataId,
+      DataId: options.dataId,
+    });
+  }
+
+  /**
+   * Fetch the binary content of a single document column.
+   *
+   * @since 0.1.1
+   */
+  public async fetchSingleDocument(
+    options: FetchSingleDocumentOptions,
+  ): Promise<FetchSingleDocumentResult> {
+    const response = await this.http.request({
+      method: 'GET',
+      path: ENDPOINTS.FETCH_SINGLE_DOCUMENT,
+      accessToken: options.accessToken,
+      query: {
+        entityId: options.entityId,
+        dataId: options.dataId,
+        columnName: options.columnName,
+      },
+    });
+    return toFetchAttachmentResult(response);
+  }
+
+  /**
+   * Upload a file to a single document column.
+   *
+   * @since 0.1.1
+   */
+  public async saveSingleDocument(
+    options: SaveSingleDocumentOptions,
+  ): Promise<SaveSingleDocumentResult> {
+    return this.upload(ENDPOINTS.SAVE_SINGLE_DOCUMENT, options, {
+      EntityId: options.entityId,
+      DataId: options.dataId,
+      ColumnName: options.columnName,
+    });
+  }
+
+  /**
+   * List the entities the user has access to.
+   *
+   * @since 0.1.1
+   */
+  public async getGenericEntities(options: BaseOptions): Promise<GetGenericEntitiesResult> {
+    const items = await this.http.requestJson<GenericEntity[]>({
+      method: 'GET',
+      path: ENDPOINTS.GET_GENERIC_ENTITIES,
+      accessToken: options.accessToken,
+    });
+    return { items };
+  }
+
+  /**
+   * List the properties of an entity.
+   *
+   * @since 0.1.1
+   */
+  public async getGenericProperties(
+    options: GetGenericPropertiesOptions,
+  ): Promise<GetGenericPropertiesResult> {
+    const items = await this.http.requestJson<GenericProperty[]>({
+      method: 'GET',
+      path: ENDPOINTS.GET_GENERIC_PROPERTIES,
+      accessToken: options.accessToken,
+      query: { entityId: options.entityId },
+    });
+    return { items };
+  }
+
+  /**
+   * List the views of an entity.
+   *
+   * @since 0.1.1
+   */
+  public async getGenericViews(options: GetGenericViewsOptions): Promise<GetGenericViewsResult> {
+    const items = await this.http.requestJson<GenericView[]>({
+      method: 'GET',
+      path: ENDPOINTS.GET_GENERIC_VIEWS,
+      accessToken: options.accessToken,
+      query: { entityId: options.entityId, viewType: options.viewType },
+    });
+    return { items };
+  }
+
+  /**
+   * List the fields of a view.
+   *
+   * @since 0.1.1
+   */
+  public async getGenericViewFields(
+    options: GetGenericViewFieldsOptions,
+  ): Promise<GetGenericViewFieldsResult> {
+    const items = await this.http.requestJson<GenericViewField[]>({
+      method: 'GET',
+      path: ENDPOINTS.GET_GENERIC_VIEW_FIELDS,
+      accessToken: options.accessToken,
+      query: { viewId: options.viewId },
+    });
+    return { items };
+  }
+
+  private async upload(
+    path: string,
+    options: UploadFileOptions,
+    target: Record<string, string | undefined>,
+  ): Promise<UploadFileResult> {
+    const input = {
+      ...target,
+      Filename: options.filename,
+      MimeType: options.mimeType,
+      MaxWidth: options.maxWidth,
+      ExpectedHash: options.expectedHash,
+    };
+    const file =
+      options.file instanceof Blob
+        ? options.file
+        : new Blob([options.file], { type: options.mimeType });
+    const body = new FormData();
+    body.append('input', JSON.stringify(input));
+    body.append('file', file, options.filename);
+    const result = await this.http.requestJson<UploadResponse>({
+      method: 'POST',
+      path,
+      accessToken: options.accessToken,
+      body,
+    });
+    return { dataId: result.DataId };
+  }
+}
+
+async function toFetchAttachmentResult(response: Response): Promise<FetchAttachmentResult> {
+  return {
+    item: Buffer.from(await response.arrayBuffer()),
+    filename: parseFilename(response.headers.get('content-disposition')),
+    mimeType: response.headers.get('content-type') ?? undefined,
+  };
 }
 
 function toApiFilter(filter: FetchFilterOptions): ApiFilter {
