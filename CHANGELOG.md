@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/robingenz/engine4-node/compare/v0.1.1...v0.1.2) (2026-10-15)
+
+
+### Bug Fixes
+
+* use OAuth error_description in ENGINE4Error message ([#7](https://github.com/robingenz/engine4-node/issues/7)) ([2a18df1](https://github.com/robingenz/engine4-node/commit/2a18df1f288298ef9d9ee9f2f1c7e02db87aaaf8))
+
 ## [0.1.1](https://github.com/robingenz/engine4-node/compare/v0.1.0...v0.1.1) (2026-10-09)
 
 
