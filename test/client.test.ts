@@ -341,4 +341,34 @@ describe('ENGINE4', () => {
       body: { message: 'Not found' },
     });
   });
+
+  it('uses the OAuth error description as the error message', async () => {
+    const body = { error: 'invalid_grant', error_description: 'invalid_username_or_password' };
+    mockFetchJson(body, 404);
+
+    const error = await client
+      .authenticate({ username: 'u', password: 'p', clientId: 'c' })
+      .catch((e) => e);
+
+    expect(error).toBeInstanceOf(ENGINE4Error);
+    expect(error).toMatchObject({ status: 404, message: 'invalid_username_or_password', body });
+  });
+
+  it('uses the OAuth error code as the error message without a description', async () => {
+    mockFetchJson({ error: 'invalid_grant' }, 400);
+
+    const error = await client
+      .authenticate({ username: 'u', password: 'p', clientId: 'c' })
+      .catch((e) => e);
+
+    expect(error).toMatchObject({ message: 'invalid_grant' });
+  });
+
+  it('prefers the message over the OAuth error description', async () => {
+    mockFetchJson({ message: 'Not found', error_description: 'Other' }, 404);
+
+    const error = await client.get({ accessToken, entityId: 'e', dataId: 'd' }).catch((e) => e);
+
+    expect(error).toMatchObject({ message: 'Not found' });
+  });
 });
