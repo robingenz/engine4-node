@@ -29,9 +29,13 @@ function extractMessage(body: unknown): string | undefined {
     return body || undefined;
   }
   if (body && typeof body === 'object') {
-    const message = (body as Record<string, unknown>).message;
-    if (typeof message === 'string') {
-      return message;
+    const record = body as Record<string, unknown>;
+    // `error_description` and `error` are used by OAuth 2.0 error responses (e.g. `/token`).
+    for (const key of ['message', 'error_description', 'error']) {
+      const value = record[key];
+      if (typeof value === 'string') {
+        return value;
+      }
     }
   }
   return undefined;
